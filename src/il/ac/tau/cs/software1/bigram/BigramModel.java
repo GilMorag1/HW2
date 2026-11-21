@@ -207,9 +207,43 @@ public class BigramModel {
 
     /*
      * @pre: fileName is a legal file path
+     * @pre: fileName has no suffix (the suffixes are added by this method)
+     * @pre: the files fileName + VOC_FILE_SUFFIX and fileName + COUNTS_FILE_SUFFIX exist and are
+     *       in the format written by saveModel (not necessarily written by this class)
+     * @post: mVocabulary is a new array, where mVocabulary[i] = the word in the line "i,<word>"
+     *        of the .voc file (the word is everything after the first comma)
+     * @post: mBigramCounts is a new mVocabulary.length x mVocabulary.length array, where
+     *        mBigramCounts[i][j] = count for every line "i,j:count" of the .counts file,
+     *        and 0 for every pair that does not appear there
+     * @post: the arrays that mVocabulary and mBigramCounts referred to before the call
+     *        are not modified
      */
     public void loadModel(String fileName) throws IOException { // Question 4
-        // TODO: implement
+        File mVoc_src = new File(fileName+VOC_FILE_SUFFIX);
+        File bigram_src = new File(fileName+COUNTS_FILE_SUFFIX);
+        //create new mVocabulary
+        BufferedReader mv_src = new BufferedReader(new FileReader(mVoc_src));
+        String firstLine = mv_src.readLine();
+        int size =Integer.parseInt(firstLine.split(" ")[0]);
+        String[] m1Voc = new String[size];
+        String line_voc;
+         while( (line_voc = mv_src.readLine()) != null){
+            String[] next_word = line_voc.split("," , 2);
+            m1Voc[Integer.parseInt(next_word[0])] = next_word[1];
+        }
+        mv_src.close();
+        //create new mBigramCounts
+        BufferedReader bg_src = new BufferedReader(new FileReader(bigram_src));
+        int[][] mBigram1 = new int[size][size];
+        String line_bigram;
+        while( (line_bigram = bg_src.readLine()) != null){
+            String[] info = line_bigram.split("[,:]");
+            mBigram1[Integer.parseInt(info[0])][Integer.parseInt(info[1])] = Integer.parseInt(info[2]);
+        }
+        bg_src.close();
+        //finished
+        mVocabulary = m1Voc;
+        mBigramCounts = mBigram1;   
     }
 
     /*

@@ -1,7 +1,11 @@
 package il.ac.tau.cs.software1.bigram;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Locale;
+
 
 public class BigramModel {
     public static final int MAX_VOCABULARY_SIZE = 14500;
@@ -79,8 +83,49 @@ public class BigramModel {
      * @post: mBigramCounts = prev(mBigramCounts)
      */
     public String[] buildVocabularyIndex(String fileName) throws IOException { // Question 1
-        // TODO: implement
-        return null;
+        String[] newVocabulary = new String[MAX_VOCABULARY_SIZE];
+        File fromFile = new File(fileName);
+        BufferedReader bf = new BufferedReader(new FileReader(fromFile));
+        String line;
+        int i = 0;
+        while ((i < MAX_VOCABULARY_SIZE) && (line = bf.readLine()) != null) {
+            String[] tokens = line.trim().split("\\s+");
+            for (String token : tokens) {
+                if (i < MAX_VOCABULARY_SIZE) {
+                    String word = normalizeWord(token);
+                    if (word != null && !containsWord(newVocabulary, word)) {
+                        newVocabulary[i] = word;
+                        i++;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+        String[] result = new String[i];
+        for (int j = 0; j < i; j++) {
+            result[j] = newVocabulary[j];
+        }
+        bf.close();
+        return result;
+    }
+
+    /*
+     * @pre: vocabulary != null
+     * @pre: the words in vocabulary are stored contiguously from index 0, and every
+     *       cell after the last word is null (no null "gaps" between words)
+     * @post: $ret = true if word appears in vocabulary, false otherwise
+     */
+    private static boolean containsWord(String[] vocabulary, String word) {
+        for (int i = 0; i < vocabulary.length; i++) {
+            if (vocabulary[i] == null) {
+                return false;
+            }
+            if (vocabulary[i].equals(word)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /*

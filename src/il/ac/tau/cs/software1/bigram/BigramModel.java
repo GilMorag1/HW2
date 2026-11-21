@@ -1,8 +1,10 @@
 package il.ac.tau.cs.software1.bigram;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -168,9 +170,39 @@ public class BigramModel {
     /*
      * @pre: the method initModel was called (the language model is initialized)
      * @pre: fileName is a legal file path
+     * @pre: fileName has no suffix (the suffixes are added by this method)
+     * @post: mVocabulary = prev(mVocabulary)
+     * @post: mBigramCounts = prev(mBigramCounts)
+     * @post: the file fileName + VOC_FILE_SUFFIX holds the line "<n> words" (n = mVocabulary.length),
+     *        followed by one line "<index>,<word>" per vocabulary word, in increasing index order
+     * @post: the file fileName + COUNTS_FILE_SUFFIX holds one line "<i>,<j>:<count>" for every
+     *        pair with mBigramCounts[i][j] != 0, ordered by i and then by j
+     * @post: every line in both files ends with System.lineSeparator(), including the last one
+     *        (an existing file with the same name is overwritten)
      */
     public void saveModel(String fileName) throws IOException { // Question 3
-        // TODO: implement
+        File newVoc = new File(fileName+VOC_FILE_SUFFIX);
+        File newCounts = new File(fileName+COUNTS_FILE_SUFFIX);
+        BufferedWriter bw_voc = new BufferedWriter(new FileWriter(newVoc));
+        BufferedWriter bw_counts = new BufferedWriter(new FileWriter(newCounts));
+        //creating .voc
+        bw_voc.write(mVocabulary.length + " words" + System.lineSeparator());
+        int i = 0;
+        for(String word: mVocabulary){
+            bw_voc.write(i + "," + word + System.lineSeparator());
+            i++;
+        }
+        //creating .counts
+        for (int j = 0; j < mBigramCounts.length; j++) {
+            for (int k=0; k<mBigramCounts[j].length;k++){
+                int curr_count = mBigramCounts[j][k];
+                if (curr_count!=0){
+                    bw_counts.write(j+","+k+":"+curr_count+System.lineSeparator());
+                }
+            }         
+        }
+        bw_counts.close();
+        bw_voc.close();
     }
 
     /*

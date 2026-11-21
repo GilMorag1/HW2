@@ -79,8 +79,13 @@ public class BigramModel {
     ///////////////////////////////////////////////////////////////////////////
 
     /*
+     * @pre: fileName is a legal path to an existing, readable text file
      * @post: mVocabulary = prev(mVocabulary)
      * @post: mBigramCounts = prev(mBigramCounts)
+     * @post: $ret is a new array holding the different legal words of the file, in their
+     *        normalized form (see normalizeWord), ordered by first appearance
+     * @post: $ret contains no duplicates and no null cells
+     * @post: $ret.length = min(number of different legal words in the file, MAX_VOCABULARY_SIZE)
      */
     public String[] buildVocabularyIndex(String fileName) throws IOException { // Question 1
         String[] newVocabulary = new String[MAX_VOCABULARY_SIZE];
@@ -129,12 +134,35 @@ public class BigramModel {
     }
 
     /*
+     * @pre: fileName is a legal path to an existing, readable text file
+     * @pre: vocabulary != null, contains no null cells and no duplicates
      * @post: mVocabulary = prev(mVocabulary)
      * @post: mBigramCounts = prev(mBigramCounts)
+     * @post: $ret is a new vocabulary.length x vocabulary.length array, where $ret[x][y] =
+     *        the number of times vocabulary[y] appeared immediately after vocabulary[x]
+     *        in the same line of the file (a token that is not in vocabulary breaks the pair)
      */
     public int[][] buildCountsArray(String fileName, String[] vocabulary) throws IOException { // Question 2
-        // TODO: implement
-        return null;
+        int[][] counts = new int[vocabulary.length][vocabulary.length];
+        File fromFile = new File(fileName);
+        BufferedReader bf = new BufferedReader(new FileReader(fromFile));
+        String line, curr, after;
+        int curr_index, after_index;
+        while( (line = bf.readLine()) != null){
+            String[] tokens = line.trim().split("\\s+");
+            curr = normalizeWord(tokens[0]);
+            curr_index = findIndex(vocabulary, curr);
+            for (int i = 1; i < tokens.length; i++) {
+                after = normalizeWord(tokens[i]);
+                after_index = findIndex(vocabulary, after);
+                if (!(curr_index == ELEMENT_NOT_FOUND || after_index == ELEMENT_NOT_FOUND)){
+                    counts[curr_index][after_index]++;
+                }
+                curr_index=after_index;
+            }
+        }       
+        bf.close();
+        return counts;
     }
 
     /*

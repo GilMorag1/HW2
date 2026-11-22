@@ -250,11 +250,28 @@ public class BigramModel {
      * @pre: sentence is in lowercase
      * @pre: the method initModel was called (the language model is initialized)
      * @pre: each two words in the sentence are separated with a single space
+     * @pre: sentence != null
+     * @post: mVocabulary = prev(mVocabulary)
+     * @post: mBigramCounts = prev(mBigramCounts)
      * @post: if sentence is probable, according to the model, $ret = true, else, $ret = false
+     * @post: if sentence is empty, $ret = true
+     * @post: if sentence has a single word, $ret = true iff the word is in mVocabulary
+     * @post: otherwise, $ret = true iff every two adjacent words w1, w2 in sentence are in
+     *        mVocabulary and the bigram <w1, w2> appeared at least once (count > 0)
      */
     public boolean isLegalSentence(String sentence) { // Question 5
-        // TODO: implement
-        return false;
+        if (sentence.isEmpty()){return true;}
+        String[] tokens = sentence.split(" ");
+        if (tokens.length == 1){return containsWord(mVocabulary, tokens[0]);}
+        int curr_index = findIndex(mVocabulary, tokens[0]);
+        int after_index;
+        for (int i = 1; i < tokens.length; i++){
+            after_index = findIndex(mVocabulary, tokens[i]);
+            if (curr_index == ELEMENT_NOT_FOUND || after_index == ELEMENT_NOT_FOUND){return false;}
+            if (mBigramCounts[curr_index][after_index] == 0){return false;}
+            curr_index=after_index;
+        }
+        return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////

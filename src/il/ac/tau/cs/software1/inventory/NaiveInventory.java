@@ -6,34 +6,34 @@ package il.ac.tau.cs.software1.inventory;
 public class NaiveInventory implements Inventory {
 
 	private static final int INITIAL_CAPACITY = 100;
-	private Collectible[] collectibles;
+	private Collectible[] collected;
 	private int counter;
 	
 	public NaiveInventory() {
-		collectibles = new Collectible[INITIAL_CAPACITY];
+		collected = new Collectible[INITIAL_CAPACITY];
 		counter = 0;
 	}
 
 	@Override
 	public void collect(Collectible collectible) {
-		if (counter == collectibles.length){doubleSize();}
-		collectibles[counter] = collectible;
+		if (counter == collected.length){doubleSize();}
+		collected[counter] = collectible;
 		counter++;
 	}
 
 	private void doubleSize(){
-		Collectible[] update = new Collectible[2*collectibles.length];
-		for (int i = 0; i < collectibles.length; i++) {
-			update[i] = collectibles[i];
+		Collectible[] update = new Collectible[2*collected.length];
+		for (int i = 0; i < collected.length; i++) {
+			update[i] = collected[i];
 		}
-		collectibles = update;
+		collected = update;
 	}
 
 	@Override
 	public float getTotalWeight() {
 		float total = 0.f;
 		for (int j =0; j<counter; j++) {
-			total += collectibles[j].getWeight();	
+			total += collected[j].getWeight();	
 		}
 		return total;
 	}
@@ -45,6 +45,6 @@ public class NaiveInventory implements Inventory {
 
 	// Returns the array of Collectibles that is stored in the field of this class
 	public Collectible[] getCollArr() {
-		return collectibles;
+		return collected;
 	}
 }
